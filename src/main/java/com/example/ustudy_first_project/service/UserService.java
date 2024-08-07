@@ -39,7 +39,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findByPhone(String phone) {
-        return userRepository.findByPhone(phone);
+    public User authenticate(String phone, String password) {
+        Optional<User> userOpt = userRepository.findByPhone(phone);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return user;
+            }
+        }
+        throw new IllegalArgumentException("Неверный номер или пароль");
     }
 }
