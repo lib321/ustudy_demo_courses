@@ -19,7 +19,7 @@ public class User {
     private String name;
 
     @NotEmpty(message = "Обязательное поле")
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number")
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Неверный формат")
     private String phone;
 
     @NotEmpty(message = "Обязательное поле")
