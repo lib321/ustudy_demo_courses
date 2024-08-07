@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -34,4 +36,10 @@ public class User {
     @NotNull(message = "Обязательное поле")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Transient
+    private String confirmationCode;
+
+    @Transient
+    private LocalDateTime confirmationCodeExpiration;
 }
