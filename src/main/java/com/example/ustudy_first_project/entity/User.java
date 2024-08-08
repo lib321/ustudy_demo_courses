@@ -37,9 +37,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Transient
     private String confirmationCode;
 
-    @Transient
-    private LocalDateTime confirmationCodeExpiration;
+    private boolean isActivated = false;
 }

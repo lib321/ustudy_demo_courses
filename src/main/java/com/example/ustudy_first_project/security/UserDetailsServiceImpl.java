@@ -20,6 +20,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+
+        if (!user.isActivated()) {
+            throw new UsernameNotFoundException("Пользователь не активирован");
+        }
+
         return new UserDetailsImpl(user);
     }
 }

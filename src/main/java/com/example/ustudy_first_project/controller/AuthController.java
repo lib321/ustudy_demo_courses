@@ -49,12 +49,15 @@ public class AuthController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> confirm(@RequestParam Long userId, @RequestParam String code) {
-        boolean success = userService.verifyConfirmationCode(userId, code);
-        if (success) {
-            return ResponseEntity.ok("Код подтверждения верен.");
+    public ResponseEntity<String> confirm(@RequestParam Long userId, @RequestParam String code) {
+
+        boolean isVerified = userService.verifyConfirmationCode(userId, code);
+
+        if (isVerified) {
+            return ResponseEntity.ok("Регистрация подтверждена, ваш аккаунт активирован.");
         } else {
-            return ResponseEntity.badRequest().body("Неверный код подтверждения или код истек.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный код подтверждения.");
         }
     }
 
@@ -74,3 +77,4 @@ public class AuthController {
         }
     }
 }
+

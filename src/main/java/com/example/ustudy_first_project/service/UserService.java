@@ -22,9 +22,6 @@ public class UserService {
     @Value("${app.registration.confirmation.code.length:4}")
     private int confirmationCodeLength;
 
-    @Value("${app.registration.confirmation.code.expiration:15}")
-    private long confirmationCodeExpirationMinutes;
-
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -46,6 +43,7 @@ public class UserService {
         user.setEmail(registrationRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         user.setRole(registrationRequest.getRole());
+        user.setActivated(false);
 
         User savedUser = userRepository.save(user);
 
@@ -53,7 +51,6 @@ public class UserService {
         emailService.sendConfirmationEmail(registrationRequest.getEmail(), code);
 
         savedUser.setConfirmationCode(code);
-        savedUser.setConfirmationCodeExpiration(LocalDateTime.now().plusMinutes(confirmationCodeExpirationMinutes));
         userRepository.save(savedUser);
 
         return savedUser;
@@ -67,24 +64,14 @@ public class UserService {
     public boolean verifyConfirmationCode(Long userId, String code) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
-        if (code.equals(user.getConfirmationCode()) && LocalDateTime.now().isBefore(user.getConfirmationCodeExpiration())) {
+        if (code.equals(user.getConfirmationCode())) {
             user.setConfirmationCode(null);
-            user.setConfirmationCodeExpiration(null);
+            user.setActivated(true);
             userRepository.save(user);
             return true;
         } else {
             return false;
         }
     }
-
-//    public User authenticate(String phone, String password) {
-//        Optional<User> userOpt = userRepository.findByPhone(phone);
-//        if (userOpt.isPresent()) {
-//            User user = userOpt.get();
-//            if (passwordEncoder.matches(password, user.getPassword())) {
-//                return user;
-//            }
-//        }
-//        throw new IllegalArgumentException("Неверный номер или пароль");
-//    }
 }
+

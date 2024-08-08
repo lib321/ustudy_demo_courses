@@ -32,11 +32,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/register", "/auth/login").permitAll()
+                                .requestMatchers("/auth/register", "/auth/login", "/auth/confirm").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
-
                 .authenticationProvider(authenticationProvider());
 
         return http.build();
