@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,4 +42,12 @@ public class User {
     private String confirmationCode;
 
     private boolean isActivated = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorite_courses",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> favoriteCourses = new HashSet<>();
 }

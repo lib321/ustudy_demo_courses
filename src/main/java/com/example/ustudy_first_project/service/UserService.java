@@ -1,7 +1,9 @@
 package com.example.ustudy_first_project.service;
 
 
+import com.example.ustudy_first_project.entity.Course;
 import com.example.ustudy_first_project.entity.User;
+import com.example.ustudy_first_project.repository.CourseRepository;
 import com.example.ustudy_first_project.repository.UserRepository;
 import com.example.ustudy_first_project.service.register.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -18,14 +21,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final CourseRepository courseRepository;
 
     @Value("${app.registration.confirmation.code.length:4}")
     private int confirmationCodeLength;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, CourseRepository courseRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.courseRepository = courseRepository;
     }
 
     public User register(RegistrationRequest registrationRequest) {
@@ -72,6 +77,31 @@ public class UserService {
         } else {
             return false;
         }
+    }
+
+    public void addToFavorites(long userId, Long courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Курс не найден"));
+        user.getFavoriteCourses().add(course);
+        userRepository.save(user);
+    }
+
+    public void removeFromFavorites(Long userId, Long courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Курс не найден"));
+
+        user.getFavoriteCourses().remove(course);
+        userRepository.save(user);
+    }
+
+    public Set<Course> getFavoriteCourses(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        return user.getFavoriteCourses();
     }
 }
 
