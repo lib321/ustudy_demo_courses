@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/auth/register", "/auth/login", "/auth/confirm").permitAll()
+                                .requestMatchers("/password/reset/**").permitAll()
                                 .requestMatchers("/admin/**").authenticated()
                                 .requestMatchers("/users/**").authenticated()
                                 .anyRequest().permitAll()

@@ -19,5 +19,16 @@ public class EmailService {
         message.setText("Ваш код подтверждения: " + code);
         mailSender.send(message);
     }
+
+    public void sendPasswordResetEmail(String to, String token) {
+        String resetUrl = "http://localhost:8080/password/reset/confirm?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Password Reset Request");
+        message.setText("To reset your password, click the link below:\n" + resetUrl);
+
+        mailSender.send(message);
+    }
 }
 

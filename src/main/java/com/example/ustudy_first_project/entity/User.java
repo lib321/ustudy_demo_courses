@@ -40,6 +40,7 @@ public class User {
     private Role role;
 
     private String confirmationCode;
+    private LocalDateTime confirmationCodeExpiration;
 
     private boolean isActivated = false;
 
@@ -50,4 +51,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private Set<Course> favoriteCourses = new HashSet<>();
+
+    private String resetToken;
+    private LocalDateTime resetTokenExpiration;
 }

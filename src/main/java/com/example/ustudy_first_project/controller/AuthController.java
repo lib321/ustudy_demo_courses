@@ -57,7 +57,7 @@ public class AuthController {
             return ResponseEntity.ok("Регистрация подтверждена, ваш аккаунт активирован.");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный код подтверждения.");
+                    .body("Неверный или истекший код подтверждения.");
         }
     }
 
