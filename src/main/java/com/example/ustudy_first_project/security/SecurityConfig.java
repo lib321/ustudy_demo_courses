@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/auth/register", "/auth/login", "/auth/confirm").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("/admin/**").authenticated()
+                                .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider());
