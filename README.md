@@ -71,3 +71,24 @@ courseId (Long) — идентификатор курса
 URL: /users/{userId}/favorites/delete/{courseId}
 Метод: DELETE
 
+Отправить код для восстановдения пароля
+URL: /password/reset/request
+Метод: POST
+Параметры:
+email
+
+Подтвердить запрос на восстановление
+URL: /password/reset/confirm
+Параметры:
+userId 
+code
+newPassword
+
+
+Если для тестирования использовать gmail почту, для отправки сообщений
+
+spring.mail.username=your_email@gmail.com
+spring.mail.password=пароль приложения
+
+то в application.properties заменить на свои значения
+

@@ -38,8 +38,9 @@ public class UserService {
             throw new IllegalArgumentException("Пароли не совпадают");
         }
 
-        if (userRepository.findByPhone(registrationRequest.getPhone()).isPresent()) {
-            throw new IllegalArgumentException("Телефон уже зарегистрирован");
+        if (userRepository.findByPhone(registrationRequest.getPhone()).isPresent() ||
+                userRepository.findByEmail(registrationRequest.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Телефон или почта уже зарегистрирован");
         }
 
         User user = new User();
@@ -81,6 +82,42 @@ public class UserService {
         } else {
             return false;
         }
+    }
+
+    public boolean verifyPasswordResetCode(Long userId, String code) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        if (user.getResetToken() == null || !user.getResetToken().equals(code)) {
+            return false;
+        }
+
+        if (user.getResetTokenExpiration().isBefore(LocalDateTime.now())) {
+            user.setResetToken(null);
+            user.setResetTokenExpiration(null);
+            userRepository.save(user);
+            return false;
+        }
+
+        return true;
+    }
+
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        String code = generateConfirmationCode();
+        user.setResetToken(code);
+        user.setResetTokenExpiration(LocalDateTime.now().plusHours(CONFIRMATION_CODE_EXPIRATION_HOURS));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetEmail(email, code);
+    }
+
+    public void resetPassword(Long userId, String newPassword) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setResetTokenExpiration(null);
+        userRepository.save(user);
     }
 
     public void addToFavorites(long userId, Long courseId) {
