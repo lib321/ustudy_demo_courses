@@ -2,9 +2,13 @@ package com.example.ustudy_first_project.controller;
 
 import com.example.ustudy_first_project.entity.Course;
 import com.example.ustudy_first_project.service.CourseService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController
@@ -34,5 +38,18 @@ public class CourseController {
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
         return ResponseEntity.ok("Курс удален");
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<?> downloadCoursePdf(@PathVariable Long id) {
+        ByteArrayInputStream pdf = courseService.generateCoursePdf(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=course_" + id + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(pdf));
     }
 }
